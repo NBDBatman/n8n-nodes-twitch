@@ -1,0 +1,71 @@
+{
+  "name": "Twitch",
+  "version": 1,
+  "type": "n8n-nodes-base.twitch",
+  "displayName": "Twitch",
+  "icon": "file:twitch.svg",
+  "group": ["transform"],
+  "description": "Interact with Twitch",
+  "defaults": {
+    "name": "Twitch"
+  },
+  "inputs": ["main"],
+  "outputs": ["main"],
+  "credentials": [
+    {
+      "name": "twitchApi",
+      "required": true
+    }
+  ],
+  "properties": [
+    {
+      "displayName": "Operation",
+      "name": "operation",
+      "type": "options",
+      "default": "getChannelStreams",
+      "noDataExpression": true,
+      "options": [
+        {
+          "name": "Get Channel Streams",
+          "value": "getChannelStreams"
+        },
+        {
+          "name": "Get Channel Information",
+          "value": "getChannelInformation"
+        },
+        {
+          "name": "Get Game Details",
+          "value": "getGameDetails"
+        },
+        {
+          "name": "Get Top Games",
+          "value": "getTopGames"
+        },
+        {
+          "name": "Search Categories",
+          "value": "searchCategories"
+        },
+        {
+          "name": "Search Channels",
+          "value": "searchChannels"
+        },
+        {
+          "name": "Get Users",
+          "value": "getUsers"
+        },
+        {
+          "name": "Get Clips",
+          "value": "getClips"
+        },
+        {
+          "name": "Get Videos",
+          "value": "getVideos"
+        },
+        {
+          "name": "Get Users Follows",
+          "value": "getUsersFollows"
+        }
+      ]
+    }
+  ]
+}

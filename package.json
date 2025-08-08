@@ -31,9 +31,9 @@
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
   },
-  "main": "index.js",
+  "main": "dist/Twitch.node.js",
   "scripts": {
-    "build": "tsc && gulp build:icons",
+    "build": "npx tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
@@ -48,25 +48,24 @@
       "dist/credentials/TwitchApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Twitch/TwitchTrigger.node.js",
-      "dist/nodes/Twitch/Twitch.node.js"
+      "dist/Twitch.node.js"
     ]
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "n8n-workflow": "^1.82.0",
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.21",
-    "gulp": "^5.0.0",
-    "jsonc-eslint-parser": "^2.4.0",
-    "nodelinter": "^0.1.9",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "eslint": "^9.27.0",
-    "globals": "^16.1.0",
     "eslint-plugin-jsonc": "^2.20.1",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
-    "typescript-eslint": "^8.32.1",
-    "@typescript-eslint/eslint-plugin": "^8.32.1",
-    "@typescript-eslint/parser": "^8.32.1"
+    "globals": "^16.1.0",
+    "gulp": "^5.0.0",
+    "jsonc-eslint-parser": "^2.4.0",
+    "n8n-workflow": "^1.82.0",
+    "nodelinter": "^0.1.9",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

@@ -1,201 +1,114 @@
 import {
-    IDataObject,
-    IExecuteFunctions,
-    INodeType,
-    INodeTypeDescription,
-} from 'n8n-workflow';
+	IDataObject,
+	IExecuteFunctions,
+	INodeType,
+	INodeTypeDescription,
+} from "n8n-workflow";
 
-import { twitchApiRequest } from './GenericFunctions.js';
+import { twitchApiRequest } from "./GenericFunctions.js";
 
 export class Twitch implements INodeType {
-    description: INodeTypeDescription = {
-        displayName: 'Twitch',
-        name: 'twitch',
-        icon: 'file:twitch.svg',
-        group: ['transform'],
-        version: 1,
-        description: 'Interact with Twitch',
-        defaults: {
-            name: 'Twitch',
-        },
-        inputs: ['main'],
-        outputs: ['main'],
-        credentials: [
-            {
-                name: 'twitchApi',
-                required: true,
-            },
-        ],
-        properties: [
-            {
-                displayName: 'Operation',
-                name: 'operation',
-                type: 'options',
-                noDataExpression: true,
-                default: 'getChannelStreams',
-                options: [
-                    {
-                        name: 'Get Channel Streams',
-                        value: 'getChannelStreams',
-                        action: 'Get channel streams',
-                    },
-                    {
-                        name: 'Get Game Details',
-                        value: 'getGameDetails',
-                        action: 'Get game details',
-                    },
-                    {
-                        name: 'Get Top Games',
-                        value: 'getTopGames',
-                        action: 'Get top games',
-                    },
-                    {
-                        name: 'Search Categories',
-                        value: 'searchCategories',
-                        action: 'Search categories',
-                    },
-                    {
-                        name: 'Search Channels',
-                        value: 'searchChannels',
-                        action: 'Search channels',
-                    },
-                ],
-            },
-            {
-                displayName: 'Channel Name',
-                name: 'channel_name',
-                type: 'string',
-                required: true,
-                default: '',
-                description: 'Name of the channel whose streams to retrieve',
-                displayOptions: {
-                    show: {
-                        operation: ['getChannelStreams'],
-                    },
-                },
-            },
-            {
-                displayName: 'Query',
-                name: 'query',
-                type: 'string',
-                required: true,
-                default: '',
-                description: 'Search query',
-                displayOptions: {
-                    show: {
-                        operation: ['searchChannels', 'searchCategories'],
-                    },
-                },
-            },
-            {
-                displayName: 'Game Name',
-                name: 'game_name',
-                type: 'string',
-                required: true,
-                default: '',
-                description: 'Name of the game',
-                displayOptions: {
-                    show: {
-                        operation: ['getGameDetails'],
-                    },
-                },
-            },
-            {
-                displayName: 'Limit',
-                name: 'limit',
-                type: 'number',
-                typeOptions: { minValue: 1 },
-                default: 50,
-                description: 'Max number of results to return',
-                displayOptions: {
-                    show: {
-                        operation: ['getTopGames'],
-                    },
-                },
-            },
-        ],
-    };
+	description: INodeTypeDescription = {
+		displayName: "Twitch",
+		name: "twitch",
+		icon: "file:twitch.svg",
+		group: ["transform"],
+		version: 1,
+		description: "Interact with Twitch",
+		defaults: {
+			name: "Twitch",
+		},
+		inputs: ["main"],
+		outputs: ["main"],
+		credentials: [
+			{
+				name: "twitchApi",
+				required: true,
+			},
+		],
+		properties: [
+			{
+				displayName: "Operation",
+				name: "operation",
+				type: "options",
+				noDataExpression: true,
+				default: "getChannelStreams",
+				options: [
+					{ name: "Get Channel Streams", value: "getChannelStreams" },
+					{ name: "Get Channel Information", value: "getChannelInformation" },
+					{ name: "Get Game Details", value: "getGameDetails" },
+					{ name: "Get Games by ID", value: "getGamesById" },
+					{ name: "Get Top Games", value: "getTopGames" },
+					{ name: "Search Categories", value: "searchCategories" },
+					{ name: "Search Channels", value: "searchChannels" },
+					{ name: "Get Users", value: "getUsers" },
+					{ name: "Get Clips", value: "getClips" },
+					{ name: "Get Videos", value: "getVideos" },
+					{ name: "Get App Access Token", value: "getAppAccessToken" },
+					{ name: "Get Schedule", value: "getSchedule" },
+					{ name: "Get Teams by Channel", value: "getTeamsByChannel" },
+				],
+			},
+			{ displayName: "Channel Name", name: "channel_name", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getChannelStreams"] } } },
+			{ displayName: "Broadcaster ID", name: "broadcaster_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getChannelInformation", "getClips", "getSchedule", "getTeamsByChannel"] } } },
+			{ displayName: "User ID", name: "user_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getVideos"] } } },
+			{ displayName: "Query", name: "query", type: "string", required: true, default: "", displayOptions: { show: { operation: ["searchChannels", "searchCategories"] } } },
+			{ displayName: "Game Name", name: "game_name", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getGameDetails"] } } },
+			{ displayName: "Game ID", name: "game_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getGamesById"] } } },
+			{ displayName: "Limit", name: "limit", type: "number", typeOptions: { minValue: 1 }, default: 50, displayOptions: { show: { operation: ["getTopGames"] } } },
+			{ displayName: "Username", name: "username", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getUsers"] } } },
+		],
+	};
 
-    async execute(this: IExecuteFunctions) {
-        const items = this.getInputData();
-        const returnData: IDataObject[] = [];
+	async execute(this: IExecuteFunctions) {
+		const items = this.getInputData();
+		const returnData: IDataObject[] = [];
 
-        for (let i = 0; i < items.length; i++) {
-            const operation = this.getNodeParameter('operation', i) as string;
+		for (let i = 0; i < items.length; i++) {
+			const operation = this.getNodeParameter("operation", i) as string;
 
-            if (operation === 'getChannelStreams') {
-                const channelName = this.getNodeParameter('channel_name', i) as string;
+			if (operation === "getAppAccessToken") {
+				const credentials = await this.getCredentials("twitchApi");
+				const response = await this.helpers.request({
+					method: "POST",
+					url: "https://id.twitch.tv/oauth2/token",
+					form: {
+						client_id: credentials.clientId,
+						client_secret: credentials.clientSecret,
+						grant_type: "client_credentials",
+					},
+					json: true,
+				});
+				return [this.helpers.returnJsonArray([response])];
+			}
 
-                const response = await twitchApiRequest.call(
-                    this,
-                    'GET',
-                    '/streams',
-                    {},
-                    { user_login: channelName },
-                );
+			const credentials = await this.getCredentials("twitchApi");
+			const headers = {
+				Authorization: `Bearer ${credentials.accessToken || credentials.access_token}`,
+				"Client-ID": credentials.clientId,
+			};
 
-                if (Array.isArray(response.data)) {
-                    returnData.push(...response.data);
-                }
-            }
+			const getRequest = async (endpoint: string, params: IDataObject = {}) => {
+				const response = await twitchApiRequest.call(this, "GET", endpoint, {}, params, headers);
+				if (Array.isArray(response.data)) returnData.push(...response.data);
+				else if (response.data) returnData.push(response.data);
+				else returnData.push(response);
+			};
 
-            if (operation === 'searchChannels') {
-                const query = this.getNodeParameter('query', i) as string;
-                const response = await twitchApiRequest.call(
-                    this,
-                    'GET',
-                    '/search/channels',
-                    {},
-                    { query },
-                );
-                if (Array.isArray(response.data)) {
-                    returnData.push(...response.data);
-                }
-            }
+			if (operation === "getChannelStreams") await getRequest("/streams", { user_login: this.getNodeParameter("channel_name", i) });
+			if (operation === "getChannelInformation") await getRequest("/channels", { broadcaster_id: this.getNodeParameter("broadcaster_id", i) });
+			if (operation === "searchChannels") await getRequest("/search/channels", { query: this.getNodeParameter("query", i) });
+			if (operation === "searchCategories") await getRequest("/search/categories", { query: this.getNodeParameter("query", i) });
+			if (operation === "getGameDetails") await getRequest("/games", { name: this.getNodeParameter("game_name", i) });
+			if (operation === "getGamesById") await getRequest("/games", { id: this.getNodeParameter("game_id", i) });
+			if (operation === "getTopGames") await getRequest("/games/top", { first: this.getNodeParameter("limit", i) });
+			if (operation === "getUsers") await getRequest("/users", { login: this.getNodeParameter("username", i) });
+			if (operation === "getClips") await getRequest("/clips", { broadcaster_id: this.getNodeParameter("broadcaster_id", i) });
+			if (operation === "getVideos") await getRequest("/videos", { user_id: this.getNodeParameter("user_id", i) });
+			if (operation === "getSchedule") await getRequest("/schedule", { broadcaster_id: this.getNodeParameter("broadcaster_id", i) });
+			if (operation === "getTeamsByChannel") await getRequest("/teams/channel", { broadcaster_id: this.getNodeParameter("broadcaster_id", i) });
+		}
 
-            if (operation === 'searchCategories') {
-                const query = this.getNodeParameter('query', i) as string;
-                const response = await twitchApiRequest.call(
-                    this,
-                    'GET',
-                    '/search/categories',
-                    {},
-                    { query },
-                );
-                if (Array.isArray(response.data)) {
-                    returnData.push(...response.data);
-                }
-            }
-
-            if (operation === 'getGameDetails') {
-                const gameName = this.getNodeParameter('game_name', i) as string;
-                const response = await twitchApiRequest.call(
-                    this,
-                    'GET',
-                    '/games',
-                    {},
-                    { name: gameName },
-                );
-                if (Array.isArray(response.data)) {
-                    returnData.push(...response.data);
-                }
-            }
-
-            if (operation === 'getTopGames') {
-                const limit = this.getNodeParameter('limit', i) as number;
-                const response = await twitchApiRequest.call(
-                    this,
-                    'GET',
-                    '/games/top',
-                    {},
-                    { first: limit },
-                );
-                if (Array.isArray(response.data)) {
-                    returnData.push(...response.data);
-                }
-            }
-        }
-
-        return [this.helpers.returnJsonArray(returnData)];
-    }
+		return [this.helpers.returnJsonArray(returnData)];
+	}
 }

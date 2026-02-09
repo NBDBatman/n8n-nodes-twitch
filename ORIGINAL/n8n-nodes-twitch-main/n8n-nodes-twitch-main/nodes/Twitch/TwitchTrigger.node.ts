@@ -58,98 +58,6 @@ export class TwitchTrigger implements INodeType {
 						value: 'channel.raid',
 					},
 					{
-						name: 'Channel Subscribe',
-						value: 'channel.subscribe',
-					},
-					{
-						name: 'Channel Subscription Gift',
-						value: 'channel.subscription.gift',
-					},
-					{
-						name: 'Channel Subscription Message',
-						value: 'channel.subscription.message',
-					},
-					{
-						name: 'Channel Goal Begin',
-						value: 'channel.goal.begin',
-					},
-					{
-						name: 'Channel Goal Progress',
-						value: 'channel.goal.progress',
-					},
-					{
-						name: 'Channel Goal End',
-						value: 'channel.goal.end',
-					},
-					{
-						name: 'Channel Hype Train Begin',
-						value: 'channel.hype_train.begin',
-					},
-					{
-						name: 'Channel Hype Train Progress',
-						value: 'channel.hype_train.progress',
-					},
-					{
-						name: 'Channel Hype Train End',
-						value: 'channel.hype_train.end',
-					},
-					{
-						name: 'Channel Charity Campaign Start',
-						value: 'channel.charity_campaign.start',
-					},
-					{
-						name: 'Channel Charity Campaign Progress',
-						value: 'channel.charity_campaign.progress',
-					},
-					{
-						name: 'Channel Charity Campaign Stop',
-						value: 'channel.charity_campaign.stop',
-					},
-					{
-						name: 'Channel Charity Donation',
-						value: 'channel.charity_donation',
-					},
-					{
-						name: 'Channel Cheer',
-						value: 'channel.cheer',
-					},
-					{
-						name: 'Channel Points Reward Add',
-						value: 'channel.channel_points_custom_reward.add',
-					},
-					{
-						name: 'Channel Points Reward Update',
-						value: 'channel.channel_points_custom_reward.update',
-					},
-					{
-						name: 'Channel Points Reward Remove',
-						value: 'channel.channel_points_custom_reward.remove',
-					},
-					{
-						name: 'Channel Points Redemption Add',
-						value: 'channel.channel_points_custom_reward_redemption.add',
-					},
-					{
-						name: 'Channel Points Redemption Update',
-						value: 'channel.channel_points_custom_reward_redemption.update',
-					},
-					{
-						name: 'Channel Ban',
-						value: 'channel.ban',
-					},
-					{
-						name: 'Channel Unban',
-						value: 'channel.unban',
-					},
-					{
-						name: 'Channel Moderator Add',
-						value: 'channel.moderator.add',
-					},
-					{
-						name: 'Channel Moderator Remove',
-						value: 'channel.moderator.remove',
-					},
-					{
 						name: 'Channel Update',
 						value: 'channel.update',
 					},
@@ -169,37 +77,6 @@ export class TwitchTrigger implements INodeType {
 				type: 'string',
 				required: true,
 				default: '',
-			},
-			{
-				displayName: 'Moderator User ID',
-				name: 'moderator_user_id',
-				type: 'string',
-				required: true,
-				default: '',
-				displayOptions: {
-					show: {
-						event: [
-							'channel.follow',
-							'channel.ban',
-							'channel.unban',
-						],
-					},
-				},
-			},
-			{
-				displayName: 'Reward ID',
-				name: 'reward_id',
-				type: 'string',
-				required: false,
-				default: '',
-				displayOptions: {
-					show: {
-						event: [
-							'channel.channel_points_custom_reward_redemption.add',
-							'channel.channel_points_custom_reward_redemption.update',
-						],
-					},
-				},
 			},
 		],
 	};
@@ -278,8 +155,6 @@ export class TwitchTrigger implements INodeType {
 				const webhookData = this.getWorkflowStaticData('node');
 				const event = this.getNodeParameter('event');
 				const channel = this.getNodeParameter('channel_name') as string;
-				const moderatorUserId = this.getNodeParameter('moderator_user_id', 0) as string;
-				const rewardId = this.getNodeParameter('reward_id', 0) as string;
 				const userData = await twitchApiRequest.call(
 					this,
 					'GET',
@@ -287,25 +162,12 @@ export class TwitchTrigger implements INodeType {
 					{},
 					{ login: channel },
 				);
-				const condition: IDataObject = {
-					broadcaster_user_id: userData.data[0].id ?? '',
-				};
-
-				if (event === 'channel.follow' || event === 'channel.ban' || event === 'channel.unban') {
-					condition.moderator_user_id = moderatorUserId || condition.broadcaster_user_id;
-				}
-
-				if (
-					event === 'channel.channel_points_custom_reward_redemption.add' ||
-					event === 'channel.channel_points_custom_reward_redemption.update'
-				) {
-					if (rewardId) condition.reward_id = rewardId;
-				}
-
 				const body = {
 					type: event,
 					version: '1',
-					condition,
+					condition: {
+						broadcaster_user_id: userData.data[0].id ?? '',
+					},
 					transport: {
 						method: 'webhook',
 						callback: webhookUrl,

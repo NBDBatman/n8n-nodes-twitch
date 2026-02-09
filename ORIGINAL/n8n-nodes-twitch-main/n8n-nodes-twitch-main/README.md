@@ -1,23 +1,29 @@
-# 🛠 Twitch node for n8n (fork)
+<p align="center">
+  <a href="https://codely.com">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://codely.com/logo/codely_logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://codely.com/logo/codely_logo-light.svg">
+      <img alt="Codely logo" src="https://codely.com/logo/codely_logo.svg">
+    </picture>
+  </a>
+</p>
 
-Trigger workflows on stream start or stream end, search for Twitch streams details…
+<h1 align="center">
+  🛠 Twitch node for n8n
+</h1>
 
-## Credits
+<p align="center">
+    <a href="https://github.com/CodelyTV"><img src="https://img.shields.io/badge/Codely-OS-green.svg?style=flat-square" alt="Codely Open Source projects"/></a>
+    <a href="https://pro.codely.com"><img src="https://img.shields.io/badge/Codely-Pro-black.svg?style=flat-square" alt="Codely Pro courses"/></a>
+</p>
 
-This project is a fork of the original CodelyTV Twitch node for n8n.
-Thanks to CodelyTV for the foundation and ongoing open-source work.
+<p align="center">
+    Trigger workflows on stream start or stream end, search for Twitch streams details…
+</p>
 
-Original project:
-- Repository: `https://github.com/CodelyTV/n8n-nodes-twitch`
-- Organization: `https://github.com/CodelyTV`
-
-## Differences From Upstream (CodelyTV)
-
-- Expanded the Twitch node with a much larger set of actions and EventSub triggers (see `TWITCH_API_COVERAGE.md`).
-- Switched credentials to OAuth2 with scopes and bearer tokens instead of app-only tokens.
-- Added a `Run Once (Ignore Item Inputs)` toggle to prevent duplicate output when multiple input items exist.
-- Enforced per-operation limits, including separate max limits for Polls (20) and Predictions (25).
-- Removed deprecated/unused endpoints (e.g., Hype Train status, Drops entitlements, and stream tags).
+<p align="center">
+  <a href="https://github.com/CodelyTV/n8n-nodes-twitch/stargazers">Stars welcomed 😊</a>
+</p>
 
 # 👀 n8n Twitch node features
 
@@ -192,7 +198,7 @@ How to locally test this node (based on [the official n8n guide](https://docs.n8
     ```
 10. Enjoy!
 
-# 👌 Code Quality Standards
+# 👌 Codely Code Quality Standards
 
 Publishing this package we are committing ourselves to the following code quality standards:
 

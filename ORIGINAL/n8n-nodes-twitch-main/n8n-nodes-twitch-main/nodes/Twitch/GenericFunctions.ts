@@ -26,12 +26,42 @@ export async function twitchApiRequest(
 	const credentials = (await this.getCredentials('twitchApi')) as IDataObject;
 
 	const clientId = credentials.clientId;
+	const clientSecret = credentials.clientSecret;
+
+	const optionsForAppToken: IHttpRequestOptions = {
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		method: 'POST',
+		qs: {
+			client_id: clientId,
+			client_secret: clientSecret,
+			grant_type: 'client_credentials',
+		},
+		url: 'https://id.twitch.tv/oauth2/token',
+		json: true,
+	};
+
+	let appTokenResponse = null;
+
+	try {
+		appTokenResponse = await this.helpers.httpRequest(optionsForAppToken);
+	} catch (errorObject: any) {
+		if (errorObject.error) {
+			const errorMessage = errorObject.error.message;
+			throw new Error(
+				`Twitch API App Token error response [${errorObject.error.status}]: ${errorMessage}`,
+			);
+		}
+		throw errorObject;
+	}
 
 	const endpoint = 'https://api.twitch.tv/helix';
 	const options: IHttpRequestOptions = {
 		headers: {
 			'Content-Type': 'application/json',
 			'Client-Id': clientId,
+			Authorization: 'Bearer ' + appTokenResponse.access_token,
 		},
 		method: method as IHttpRequestMethods,
 		body,
@@ -46,19 +76,8 @@ export async function twitchApiRequest(
 		delete options.qs;
 	}
 
-	const optionObj = option as IDataObject;
-	const optionHeaders = (optionObj.headers as IDataObject | undefined) ?? {};
-	const requestOptions: IHttpRequestOptions = {
-		...options,
-		...optionObj,
-		headers: {
-			...(options.headers || {}),
-			...optionHeaders,
-		},
-	};
-
 	try {
-		return await this.helpers.requestWithAuthentication.call(this, 'twitchApi', requestOptions);
+		return await this.helpers.httpRequest(options);
 	} catch (errorObject: any) {
 		if (errorObject.error) {
 			const errorMessage = errorObject.error.message;

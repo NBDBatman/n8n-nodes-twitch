@@ -191,3 +191,7 @@ How to locally test this node (based on [the official n8n guide](https://docs.n8
     n8n start
     ```
 10. Enjoy!
+
+
+# Note:
+I am not a developer by nature I am learning how to do this and I will try to keep this updated if things change

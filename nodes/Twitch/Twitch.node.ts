@@ -47,16 +47,26 @@ export class Twitch implements INodeType {
 					{ name: "Get App Access Token", value: "getAppAccessToken" },
 					{ name: "Get Schedule", value: "getSchedule" },
 					{ name: "Get Teams by Channel", value: "getTeamsByChannel" },
+					{ name: "Get Channel Followers", value: "getChannelFollowers" },
 				],
 			},
 			{ displayName: "Channel Name", name: "channel_name", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getChannelStreams"] } } },
-			{ displayName: "Broadcaster ID", name: "broadcaster_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getChannelInformation", "getClips", "getSchedule", "getTeamsByChannel"] } } },
+			{ displayName: "Broadcaster ID", name: "broadcaster_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getChannelInformation", "getClips", "getSchedule", "getTeamsByChannel", "getChannelFollowers"] } } },
 			{ displayName: "User ID", name: "user_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getVideos"] } } },
 			{ displayName: "Query", name: "query", type: "string", required: true, default: "", displayOptions: { show: { operation: ["searchChannels", "searchCategories"] } } },
 			{ displayName: "Game Name", name: "game_name", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getGameDetails"] } } },
 			{ displayName: "Game ID", name: "game_id", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getGamesById"] } } },
 			{ displayName: "Limit", name: "limit", type: "number", typeOptions: { minValue: 1 }, default: 50, displayOptions: { show: { operation: ["getTopGames"] } } },
 			{ displayName: "Username", name: "username", type: "string", required: true, default: "", displayOptions: { show: { operation: ["getUsers"] } } },
+			{
+				displayName: "Max Results (min 1, max 100)",
+				name: "followers_first",
+				type: "number",
+				default: 20,
+				typeOptions: { minValue: 1, maxValue: 100 },
+				displayOptions: { show: { operation: ["getChannelFollowers"] } },
+				description: "Maximum number of followers to return per page (1-100). Default is 20.",
+			},
 		],
 	};
 
@@ -92,7 +102,7 @@ export class Twitch implements INodeType {
 				const response = await twitchApiRequest.call(this, "GET", endpoint, {}, params, headers);
 				if (Array.isArray(response.data)) returnData.push(...response.data);
 				else if (response.data) returnData.push(response.data);
-				else returnData.push(response);
+				if (!response.data) returnData.push(response);
 			};
 
 			if (operation === "getChannelStreams") await getRequest("/streams", { user_login: this.getNodeParameter("channel_name", i) });
@@ -107,6 +117,18 @@ export class Twitch implements INodeType {
 			if (operation === "getVideos") await getRequest("/videos", { user_id: this.getNodeParameter("user_id", i) });
 			if (operation === "getSchedule") await getRequest("/schedule", { broadcaster_id: this.getNodeParameter("broadcaster_id", i) });
 			if (operation === "getTeamsByChannel") await getRequest("/teams/channel", { broadcaster_id: this.getNodeParameter("broadcaster_id", i) });
+			if (operation === "getChannelFollowers") {
+				const first = this.getNodeParameter("followers_first", i) as number;
+				const params: IDataObject = { broadcaster_id: this.getNodeParameter("broadcaster_id", i) };
+				if (first) params.first = first;
+				const response = await twitchApiRequest.call(this, "GET", "/channels/followers", {}, params, headers);
+				if (Array.isArray(response.data)) returnData.push(...response.data);
+				else if (response.data) returnData.push(response.data);
+				if (response.total !== undefined) returnData.push({ total: response.total });
+				if (!response.data && response.total === undefined && response.pagination === undefined) {
+					returnData.push(response);
+				}
+			}
 		}
 
 		return [this.helpers.returnJsonArray(returnData)];

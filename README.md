@@ -54,7 +54,7 @@ Once we get that verification, you will be able to install this node following [
 ### b.a) Not using queue mode: GUI installation
 
 Follow [the official instructions](https://docs.n8n.io/integrations/community-nodes/installation/gui-install/)
-specifying `@codelytv/n8n-nodes-twitch` as the node name to install:
+specifying `@mercuryhq/n8n-nodes-twitch` as the node name to install:
 
 <img alt="Twitch community node installation" src="/docs/node-installation.png" width="336" height="241">
 
@@ -68,7 +68,7 @@ Go to the folder where n8n is installed (if you are using the standard Docker in
 `/usr/local/lib/node_modules/n8n`) and install the package as any other npm package:
 
 ```bash
-npm i @codelytv/n8n-nodes-twitch
+npm i @mercuryhq/n8n-nodes-twitch
 ```
 
 ### b.b.b) Install as Custom Docker image
@@ -81,13 +81,13 @@ FROM n8nio/n8n:${N8N_VERSION}
 
 RUN if [ -z "$N8N_VERSION" ]; then echo "💥 N8N_VERSION argument missing."; exit 1; fi && \
     mkdir -p /home/node/.n8n/nodes && \
-    npm install --prefix /home/node/.n8n/nodes --production --silent @codelytv/n8n-nodes-twitch
+    npm install --prefix /home/node/.n8n/nodes --production --silent @mercuryhq/n8n-nodes-twitch
 ```
 
 ### b.b.c) Install using Docker Compose / Docker Swarm with mapped volume
 
 Take into account that this option has a considerable downside:
-The workflows you create will contain `CUSTOM.twitchTrigger` as the node type reference instead of `@codelytv/n8n-nodes-twitch.twitchTrigger`. However, it could be the best approach if you want a faster feedback loop while developing.
+The workflows you create will contain `CUSTOM.twitchTrigger` as the node type reference instead of `@mercuryhq/n8n-nodes-twitch.twitchTrigger`. However, it could be the best approach if you want a faster feedback loop while developing.
 Take into account that localhost will not be reachable from Twitch, so you `probably are interested into exposing it with a tunnel using something like `cloudflared`, or just expose a remote host to Twitch.
 
 Docker Compose / Docker Swarm definition snippet:
@@ -101,7 +101,7 @@ services:
   n8n-main:
     volumes:
       - n8n_data:/home/node/.n8n
-      - /home/codely/n8n-custom-nodes:/home/node/.n8n/custom
+      - /home/mercuryhq/n8n-custom-nodes:/home/node/.n8n/custom
 ```
 
 Deploy process:
@@ -116,7 +116,7 @@ docker run --rm \
   -v "$CUSTOM_NODES_DIR":/data \
   -w /data \
   node:22-alpine \
-  sh -c "npm install @codelytv/n8n-nodes-twitch --production --silent"
+  sh -c "npm install @mercuryhq/n8n-nodes-twitch --production --silent"
 
 docker stack deploy -c n8n-swarm.yml n8n
 ```
@@ -147,8 +147,8 @@ How to locally test this node (based on [the official n8n guide](https://docs.n8
 
 1. Clone and move to the node development folder
    ```bash
-   cd ~/Code/work/codely/public/
-   git clone git@github.com:CodelyTV/n8n-nodes-twitch.git
+   cd ~/Code/work/mercuryhq/public/
+   git clone git@github.com:NBDBatman/n8n-nodes-twitch.git
    cd n8n-nodes-twitch
    ```
 2. Build the node
@@ -173,7 +173,7 @@ How to locally test this node (based on [the official n8n guide](https://docs.n8
     cd custom
 7. Link the node package to the symlink previously created
     ```bash
-    npm link @codelytv/n8n-nodes-twitch
+    npm link @mercuryhq/n8n-nodes-twitch
     ```
 8. Validate that the local n8n instance has the Twitch node pointing to the local folder
    ```bash
@@ -183,8 +183,8 @@ How to locally test this node (based on [the official n8n guide](https://docs.n8
    ```bash
    .
    └── node_modules
-       └── @codelytv
-           └── n8n-nodes-twitch -> ../../../../Code/work/codely/public/n8n-nodes-twitch
+       └── @mercuryhq
+           └── n8n-nodes-twitch -> ../../../../Code/work/mercuryhq/public/n8n-nodes-twitch
    ```
 9. Run n8n
     ```bash

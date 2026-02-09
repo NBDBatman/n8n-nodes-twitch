@@ -7,3 +7,4 @@ npm-debug.log*
 yarn.lock
 TWITCH_API_COVERAGE.md
 scopes.md
+ORIGINAL/*

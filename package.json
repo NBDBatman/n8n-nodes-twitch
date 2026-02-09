@@ -33,7 +33,7 @@
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
   },
-  "main": "dist/Twitch.node.js",
+  "main": "dist/nodes/Twitch/Twitch.node.js",
   "scripts": {
     "build": "npx tsc && gulp build:icons",
     "dev": "tsc --watch",
@@ -50,7 +50,8 @@
       "dist/credentials/TwitchApi.credentials.js"
     ],
     "nodes": [
-      "dist/Twitch.node.js"
+      "dist/nodes/Twitch/Twitch.node.js",
+      "dist/nodes/Twitch/TwitchTrigger.node.js"
     ]
   },
   "devDependencies": {

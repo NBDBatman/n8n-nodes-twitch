@@ -1,6 +1,6 @@
 {
-  "name": "@codelytv/n8n-nodes-twitch",
-  "version": "1.8.0",
+  "name": "@MercuryHQ/n8n-nodes-twitch",
+  "version": "1.9.0",
   "description": "n8n node for Twitch: Execute workflows on stream start, stream end, and new follows.",
   "keywords": [
     "n8n",
@@ -11,20 +11,22 @@
     "streaming",
     "n8n-community-node-package",
     "codely",
-    "codelytv"
+    "codelytv",
+    "MercuryHQ",
+    "mercuryhq"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/codelytv/n8n-nodes-twitch#readme",
+  "homepage": "https://github.com/NBDBatman/n8n-nodes-twitch#readme",
   "bugs": {
-    "url": "https://github.com/codelytv/n8n-nodes-twitch/issues"
+    "url": "https://github.com/NBDBatman/n8n-nodes-twitch/issues"
   },
   "author": {
-    "name": "CodelyTV",
-    "email": "support@codely.com"
+    "name": "NBDBatman",
+    "email": "support@mercuryhq.xyz"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/CodelyTV/n8n-nodes-twitch"
+    "url": "https://github.com/NBDBatman/n8n-nodes-twitch"
   },
   "type": "module",
   "engines": {
@@ -62,7 +64,7 @@
     "globals": "^16.1.0",
     "gulp": "^5.0.0",
     "jsonc-eslint-parser": "^2.4.0",
-    "n8n-workflow": "^1.82.0",
+    "n8n-workflow": "^2.7.1",
     "nodelinter": "^0.1.9",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1"

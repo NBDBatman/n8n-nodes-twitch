@@ -12,6 +12,45 @@ import {
 
 import { twitchApiRequest } from './GenericFunctions.js';
 
+async function twitchAppRequest(
+	this: IHookFunctions,
+	method: string,
+	resource: string,
+	body: IDataObject = {},
+	query: IDataObject = {},
+): Promise<any> {
+	const credentials = (await this.getCredentials('twitchApi')) as IDataObject;
+	const clientId = credentials.clientId as string;
+	const clientSecret = credentials.clientSecret as string;
+
+	const tokenResponse = await this.helpers.request({
+		method: 'POST',
+		uri: 'https://id.twitch.tv/oauth2/token',
+		qs: {
+			client_id: clientId,
+			client_secret: clientSecret,
+			grant_type: 'client_credentials',
+		},
+		json: true,
+	});
+
+	const endpoint = 'https://api.twitch.tv/helix';
+	const options = {
+		method,
+		uri: `${endpoint}${resource}`,
+		qs: Object.keys(query).length ? query : undefined,
+		body: Object.keys(body).length ? body : undefined,
+		headers: {
+			'Client-Id': clientId,
+			Authorization: `Bearer ${tokenResponse.access_token}`,
+			'Content-Type': 'application/json',
+		},
+		json: true,
+	};
+
+	return await this.helpers.request(options);
+}
+
 export class TwitchTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Twitch Trigger',
@@ -257,7 +296,7 @@ export class TwitchTrigger implements INodeType {
 				const webhookData = this.getWorkflowStaticData('node');
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const event = this.getNodeParameter('event') as string;
-				const { data: webhooks } = await twitchApiRequest.call(
+				const { data: webhooks } = await twitchAppRequest.call(
 					this,
 					'GET',
 					'/eventsub/subscriptions',
@@ -280,7 +319,7 @@ export class TwitchTrigger implements INodeType {
 				const channel = this.getNodeParameter('channel_name') as string;
 				const moderatorUserId = this.getNodeParameter('moderator_user_id', 0) as string;
 				const rewardId = this.getNodeParameter('reward_id', 0) as string;
-				const userData = await twitchApiRequest.call(
+				const userData = await twitchAppRequest.call(
 					this,
 					'GET',
 					'/users',
@@ -312,7 +351,7 @@ export class TwitchTrigger implements INodeType {
 						secret: 'n8ncreatedSecret',
 					},
 				};
-				const webhook = await twitchApiRequest.call(
+				const webhook = await twitchAppRequest.call(
 					this,
 					'POST',
 					'/eventsub/subscriptions',
@@ -324,7 +363,7 @@ export class TwitchTrigger implements INodeType {
 			async delete(this: IHookFunctions): Promise<boolean> {
 				const webhookData = this.getWorkflowStaticData('node');
 				try {
-					await twitchApiRequest.call(
+					await twitchAppRequest.call(
 						this,
 						'DELETE',
 						'/eventsub/subscriptions',
